@@ -1,0 +1,38 @@
+<config>
+  <language>portuguese</language>
+
+  <lucene>
+	   <indexPath>resources/luceneIndexes/portuguese</indexPath>
+  </lucene>
+
+  <hitsPerQuery>10</hitsPerQuery>
+
+  <corpusPath>corpus</corpusPath>
+
+  <normalizers>RemoveDiacriticalMarks</normalizers>
+  <normalizersPath>resources/normalizers/puncts.txt</normalizersPath>
+
+  <stopwords>resources/stopwords/portuguese_stop_smaller.txt</stopwords>
+
+  <!-- Similarity measures to use -->
+  <similarityMeasure name="Dice" weight="25"/>
+  <similarityMeasure name="Jaccard" weight="25"/>
+  <similarityMeasure name="EditDistance" weight="50"/>
+
+  <!-- Answer selection criteria -->
+  <criteria>
+    <criterion name="AnswerFrequency" weight="0"/>
+    <criterion name="AnswerSimilarityToUserQuestion" weight="0"/>
+    <criterion name="QuestionSimilarityToUserQuestion" weight="0"/>
+    <criterion name="SimpleTimeDifference" weight="0"/>
+    <criterion name="SimpleConversationContext" weight="100" nPreviousInteractions="2"/>
+  </criteria>
+  <!-- Reference corpus (Learning/Evaluation modes only)-->
+  <referenceCorpus>
+    <folder>interactions/</folder>
+    <interactions>interactions.txt</interactions>
+    <lines>movie_lines.txt</lines>
+    <inputSize>10</inputSize>
+  </referenceCorpus>
+
+</config>
