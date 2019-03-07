@@ -27,6 +27,18 @@ def getNormalizers():
     normalizersStrings = mydoc.getElementsByTagName('normalizers')[0]
     return (normalizersStrings.firstChild.data).split(',')
 
+def getDbPath():
+    dbPath = mydoc.getElementsByTagName('dbPath')[0]
+    return dbPath.firstChild.data
+
+def getNoAnswerMessage():
+    language = getLanguage()
+    if language == 'english':
+        noAnswerMessage = mydoc.getElementsByTagName('noAnswerFoundEN')[0]
+    elif language == 'portuguese':
+        noAnswerMessage = mydoc.getElementsByTagName('noAnswerFoundPT')[0]
+    return noAnswerMessage.firstChild.data
+
 def getHitsPerQuery():
     hitsPerQuery = mydoc.getElementsByTagName('hitsPerQuery')[0]
     return hitsPerQuery.firstChild.data
@@ -51,17 +63,6 @@ def getStopWordsPath():
     stopWordsPath = mydoc.getElementsByTagName('stopwords')[0]
     return stopWordsPath.firstChild.data
 
-def getReferencesFolder():
-    folder = mydoc.getElementsByTagName('folder')[0]
-    return folder.firstChild.data
-
-def getReferencesInteractions():
-    interactions = mydoc.getElementsByTagName('interactions')[0]
-    return interactions.firstChild.data
-
-def getReferencesLines():
-    lines = mydoc.getElementsByTagName('lines')[0]
-    return lines.firstChild.data
 
 def getReferencesInputSize():
     inputSize = mydoc.getElementsByTagName('inputSize')[0]
