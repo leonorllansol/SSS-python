@@ -49,8 +49,10 @@ In this file, several settings should be configured before running SSS:
 - `<language>`: `english` or `portuguese`.
 
 ### Lucene
-
-- `<indexPath>`: Path (relative to `SSS` folder) where the corpus indices are stored. Should end with a folder with the same name as the language selected. 
+- `<dbPath>`: Path (relative to `SSS` folder) to the corpus database file (`db.db4o`) for the selected language. E.g.
+```  <dbPath>/resources/luceneDB/portuguese/this.db.db4o</dbPath>```
+- `<indexPath>`: Path (relative to `SSS` folder) where the corpus indices are stored. Should end with a folder with the same name as the language selected. E.g.
+```<indexPath>resources/luceneIndexes/portuguese</indexPath>```
 - `<hitsPerQuery>`: Number of candidates retrieved by Lucene.
 
 ### Resources
@@ -63,7 +65,6 @@ In this file, several settings should be configured before running SSS:
  - `<normalizers>`: Names of the normalizers to be used (depending on the selected language), separated by commas. They should match the names in the `NormalizerFactory`.
  - `<normalizersPath>`: Path (relative to `SSS` folder) to the file with punctuation to use in the `SimpleNormalizer`.
  
-
 ### Similarity
 
 - `<similarityMeasure>`: The similarity measure to be used in some of the criteria, identified by its `name` (should match one of the names in the `SimilarityMeasureFactory`). Each similarityMeasure has a `weight` (an integer value between 0 and 100). There can be more than one similarity measure, and their weights must sum to 100.
@@ -71,4 +72,8 @@ In this file, several settings should be configured before running SSS:
 ### Criteria
 
 - `<criterion>`: Each criterion that will be used to select the best answer, identified by its `name` (should match the name in the `QaScorerFactory`). Each criterion has a `weight` (an integer value between 0 and 100). The sum of the criterion weights should be equal to 100. The `SimpleConversationContext` criterion is also characterized by the `nPreviousInteractions` to consider.
+
+### No answer found messages
+
+- `<noAnswerFoundPT>` and - `<noAnswerFoundEN>`: Message to be presented when no answer is retrieved.
 
