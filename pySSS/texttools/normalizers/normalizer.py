@@ -1,3 +1,5 @@
+from nltk.stem import WordNetLemmatizer
+
 class Normalizer:
     def applyNormalizations(self, text, normalizers):
         normalized = text
@@ -5,7 +7,13 @@ class Normalizer:
             normalized = normalizer.normalize(normalized)
         return normalized
 
-
-'''class EnglishLemmatizer(Normalizer):
+class EnglishLemmatizer(Normalizer):
     def __init__(self):
-        self.textAnalyzer = TextAnalyzer()'''
+        self.textAnalyzer = TextAnalyzer()
+        self.wnl = WordNetLemmatizer()
+
+    def normalize(self, text):
+        words = text.split()
+        for word in words:
+            word = self.wnl.lemmatize(word)
+        return " ".join(words)
