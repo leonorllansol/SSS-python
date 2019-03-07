@@ -41,8 +41,7 @@ public class LuceneWrapper{
   private IndexSearcher searcher;
   private int hitsPerQuery;
   public static ObjectContainer db;
-  public static final String DB4OFILENAME = Paths.get("").toAbsolutePath().toString()
-      + "/resources/luceneDB/portuguese/this.db.db4o";
+  public static String DB4OFILENAME = "";
 
   public static void main(String[] args) throws IOException{
     int flag = Integer.parseInt(args[0]);
@@ -52,6 +51,9 @@ public class LuceneWrapper{
       String query_normalized = args[2];
       String language = args[3];
       String pathOfIndex = args[4];
+      String pathOfDb = args[6];
+
+      DB4DB4OFILENAME = Paths.get("").toAbsolutePath().toString() + pathOfDb;
 
       LuceneWrapper lw = new LuceneWrapper();
       lw.hitsPerQuery = Integer.parseInt(args[5]);
