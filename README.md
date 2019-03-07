@@ -5,10 +5,9 @@ This is a Python implementation of SSS, which was originally implemented in Java
 
 # Setup
 
-## Libraries and resources
+## Resources
 
-Add your libraries to a folder lib that should be inside the SSS folder. Add your resources to the folder resources, found
-inside the SSS folder (see the **Configurations** section below to learn how to include your corpus).
+Add your resources to the folder `resources`, found inside the `SSS` folder (see the **Configurations** section below to learn how to include your corpus).
 
 ## Requirements
 
