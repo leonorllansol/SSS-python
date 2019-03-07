@@ -74,7 +74,7 @@ In this file, several settings should be configured before running SSS:
 
 ### Normalizers
 
- - `<normalizers>`: Names of the normalizers to be used (depending on the selected language), separated by commas. They should match the names in the `NormalizerFactory`.
+ - `<normalizers>`: Names of the normalizers to be used (depending on the selected language), separated by commas. They should match the names in the `NormalizerFactory`. Note on the **Portuguese Stemmer Normalizer**: before using this normalizer, run `nltk.download()`, choosing the option *Download all*.
  - `<normalizersPath>`: Path (relative to `SSS` folder) to the file with punctuation to use in the `SimpleNormalizer`.
  
 ### Similarity
