@@ -29,6 +29,7 @@ Running the script setup.sh will setup your java environment and compile the jav
 python3 SaySomethingSmart.py
 ```
 
+The program can be terminated by typing `exit`.
 # Configurations
 
 ## Notes about folder structure
@@ -38,8 +39,14 @@ need to alternate between different languages, you should keep the corpora for e
 You should have a different folder per language for both the database file (```db.db4o```) and the index files. This folder should be named according to the language selected in the ```config.xml``` file (```english``` or ```portuguese```).
 
 ## Notes on adding a new similarity measure
+- add it to config.xml in the form: `<similarityMeasure name="Jaccard" weight="50"/>`
+- add class representing the new similarity measure to `SSS/similarity/SimilarityMeasure.py`
+- add *if statement* regarding the creation of new similarity measure to `SSS/similarity/SimilarityMeasureFactory.py`
 
 ## Notes on adding a new criterion to select best answer (evaluator)
+- add it to config.xml in the form: `<criterion name="AnswerFrequency" weight="50"/>`
+- add class representing the new criterion to `SSS/dialog/evaluators/QaScorer.py`
+- add *if statement* regarding the creation of new similarity measure to `SSS/dialog/evaluators/QaScorerFactory.py`
 
 ## config.xml
 In this file, several settings should be configured before running SSS:
@@ -75,5 +82,5 @@ In this file, several settings should be configured before running SSS:
 
 ### No answer found messages
 
-- `<noAnswerFoundPT>` and - `<noAnswerFoundEN>`: Message to be presented when no answer is retrieved.
+- `<noAnswerFoundPT>` and `<noAnswerFoundEN>`: Message to be presented when no answer is retrieved.
 
