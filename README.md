@@ -1,7 +1,7 @@
 Say Something Smart (SSS) is a dialogue engine based on a large corpus of movie subtitles (Subtle). SSS receives a user
 request and retrieves an answer from a set of candidates that are retrieved from the corpus using Lucene. The selection of the
 best answer among those candidates is made according to a set of weighted criteria, whose weights are previously defined. 
-This is a Python implementation of SSS, which is originally implemented in Java. 
+This is a Python implementation of SSS, which was originally implemented in Java. 
 
 # Setup
 
