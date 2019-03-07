@@ -39,7 +39,7 @@ need to alternate between different languages, you should keep the corpora for e
 You should have a different folder per language for both the database file (```db.db4o```) and the index files. This folder should be named according to the language selected in the ```config.xml``` file (```english``` or ```portuguese```).
 
 ## Notes on adding a new similarity measure
-- add it to config.xml in the form: `<similarityMeasure name="Jaccard" weight="50"/>`
+- add it to `config.xml` in the form: `<similarityMeasure name="Jaccard" weight="50"/>`
 - add class representing the new similarity measure to `SSS/similarity/SimilarityMeasure.py`
 - add *if statement* regarding the creation of new similarity measure to `SSS/similarity/SimilarityMeasureFactory.py`
 
