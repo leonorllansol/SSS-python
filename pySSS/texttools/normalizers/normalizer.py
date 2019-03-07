@@ -9,7 +9,6 @@ class Normalizer:
 
 class EnglishLemmatizer(Normalizer):
     def __init__(self):
-        self.textAnalyzer = TextAnalyzer()
         self.wnl = WordNetLemmatizer()
 
     def normalize(self, text):
