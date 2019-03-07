@@ -2,17 +2,19 @@
   <language>portuguese</language>
 
   <lucene>
-	   <indexPath>resources/luceneIndexes/portuguese</indexPath>
+    <dbPath>/resources/luceneDB/portuguese/this.db.db4o</dbPath>
+    <indexPath>resources/luceneIndexes/portuguese</indexPath>
+    <hitsPerQuery>10</hitsPerQuery>
   </lucene>
 
-  <hitsPerQuery>10</hitsPerQuery>
 
-  <corpusPath>corpus</corpusPath>
+  <paths>
+    <corpusPath>corpus</corpusPath>
+    <normalizersPath>resources/normalizers/puncts.txt</normalizersPath>
+    <stopwords>resources/stopwords/portuguese_stop_smaller.txt</stopwords>
+  </paths>
 
   <normalizers>RemoveDiacriticalMarks</normalizers>
-  <normalizersPath>resources/normalizers/puncts.txt</normalizersPath>
-
-  <stopwords>resources/stopwords/portuguese_stop_smaller.txt</stopwords>
 
   <!-- Similarity measures to use -->
   <similarityMeasure name="Dice" weight="25"/>
@@ -27,12 +29,7 @@
     <criterion name="SimpleTimeDifference" weight="0"/>
     <criterion name="SimpleConversationContext" weight="100" nPreviousInteractions="2"/>
   </criteria>
-  <!-- Reference corpus (Learning/Evaluation modes only)-->
-  <referenceCorpus>
-    <folder>interactions/</folder>
-    <interactions>interactions.txt</interactions>
-    <lines>movie_lines.txt</lines>
-    <inputSize>10</inputSize>
-  </referenceCorpus>
+
+  <noAnswerFoundPT>Não sei responder a isso</noAnswerFoundPT> 
 
 </config>
