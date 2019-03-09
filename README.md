@@ -1,6 +1,5 @@
 Say Something Smart (SSS) is a dialogue engine based on a large corpus of movie subtitles (Subtle). SSS receives a user
-request and retrieves an answer from a set of candidates that are retrieved from the corpus using Lucene. The selection of the
-best answer among those candidates is made according to a set of weighted criteria, whose weights are previously defined. 
+request and retrieves an answer from a set of candidates that are retrieved from the corpus using Lucene. The selection of the best answer among those candidates is made according to a set of weighted criteria (heuristics), whose weights are previously defined. These criteria use similarity measures to measure the distance between, for example, the user query and a query from one of the Lucene candidates. These similarity measures also have weights that are defined on the file config.xml.
 This is a Python implementation of SSS, which was originally implemented in Java. 
 
 # Setup
@@ -36,21 +35,6 @@ The program can be terminated by typing `exit`.
 When indexing a corpus using Lucene, SSS will look through all the files in the specified corpus folder. Thus, in the event you
 need to alternate between different languages, you should keep the corpora for each language in separate folders.
 You should have a different folder per language for both the database file (```db.db4o```) and the index files. This folder should be named according to the language selected in the ```config.xml``` file (```english``` or ```portuguese```).
-
-## Adding a new similarity measure
-- add it to `config.xml` in the form: `<similarityMeasure name="Jaccard" weight="50"/>`
-- add class representing the new similarity measure to `SSS/similarity/SimilarityMeasure.py`
-- add *if statement* regarding the creation of new similarity measure to `SSS/similarity/SimilarityMeasureFactory.py`
-
-## Adding a new criterion to select best answer (evaluator)
-- add it to config.xml in the form: `<criterion name="AnswerFrequency" weight="50"/>`
-- add class representing the new criterion to `SSS/dialog/evaluators/QaScorer.py`
-- add *if statement* regarding the creation of new similarity measure to `SSS/dialog/evaluators/QaScorerFactory.py`
-
-## Adding a new normalizer
-- add it to `config.xml` in the `normalizers` tag
-- add class representing the new normalizer to `SSS/texttools/normalizers/normalizer.py`
-- add *if statement* regarding the creation of new normalizer to `SSS/texttools/normalizers/normalizerFactory.py`
 
 ## config.xml
 In this file, several settings should be configured before running SSS:
@@ -88,3 +72,19 @@ In this file, several settings should be configured before running SSS:
 
 - `<noAnswerFoundPT>` and `<noAnswerFoundEN>`: Message to be presented when no answer is retrieved.
 
+# Advanced
+
+## Adding a new similarity measure
+- add it to `config.xml` in the form: `<similarityMeasure name="Jaccard" weight="50"/>`
+- add class representing the new similarity measure to `SSS/similarity/SimilarityMeasure.py`
+- add *if statement* regarding the creation of new similarity measure to `SSS/similarity/SimilarityMeasureFactory.py`
+
+## Adding a new criterion to select best answer (evaluator)
+- add it to config.xml in the form: `<criterion name="AnswerFrequency" weight="50"/>`
+- add class representing the new criterion to `SSS/dialog/evaluators/QaScorer.py`
+- add *if statement* regarding the creation of new similarity measure to `SSS/dialog/evaluators/QaScorerFactory.py`
+
+## Adding a new normalizer
+- add it to `config.xml` in the `normalizers` tag
+- add class representing the new normalizer to `SSS/texttools/normalizers/normalizer.py`
+- add *if statement* regarding the creation of new normalizer to `SSS/texttools/normalizers/normalizerFactory.py`
