@@ -1,4 +1,6 @@
 import subprocess
+import configParser
+
 class SimpleQA:
     def __init__(self, previousQA, question, normalizedQuestion, answer, normalizedAnswer, diff):
         self.previousQA = previousQA    #is a number
@@ -15,7 +17,7 @@ class SimpleQA:
     def getPreviousQA(self):
         if int(self.previousQA) != -1:
             #getSimpleQA from LuceneWrapper
-            list_args = ["java", "LuceneWrapper", self.previousQA]
+            list_args = ["java", "LuceneWrapper", self.previousQA, configParser.getCorpusPath(), "", configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
             sp1 = subprocess.Popen(list_args,shell=False)
             exitCode = sp1.wait()
 
