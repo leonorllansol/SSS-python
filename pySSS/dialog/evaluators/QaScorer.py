@@ -98,13 +98,16 @@ class SimpleConversationContext(QaScorer): #TODO
 
         for qa in candidates:
             currentQA = qa.getPreviousQA()
-            if currentQA != -1:
 
+            if currentQA != -1:
                 for i in range(0, self.nPreviousQa):
                     basicQA = conversation.getNFromLastQA(i)
                     if basicQA == -1:   #index out of range
                         break
-                    currentQA = currentQA.getPreviousQA().getPreviousQA()  ##erro aqui
+                    currentQA = currentQA.getPreviousQA()  ##erro aqui
+
+                    if currentQA == -1:
+                        break
 
                     tokenizedQuestion = basicQA.getNormalizedQuestion().split()
                     tokenizedAnswer = basicQA.getNormalizedAnswer().split()
