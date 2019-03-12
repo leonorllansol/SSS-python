@@ -19,7 +19,7 @@ class AbstractAnswerSelection:
     def provideAnswer(self, query):
         query_normalized = Normalizer().applyNormalizations(query, self.normalizers)
 
-        list_args = ["java", "LuceneWrapper", "0", configParser.getCorpusPath(), query_normalized, configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
+        list_args = ["java", "LuceneWrapper", "-2", configParser.getCorpusPath(), query_normalized, configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
         sp1 = subprocess.Popen(list_args,shell=False)
         exitCode = sp1.wait()
 
