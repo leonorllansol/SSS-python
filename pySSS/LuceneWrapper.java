@@ -13,6 +13,10 @@ import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 import com.db4o.config.EmbeddedConfiguration;
 
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.store.LockObtainFailedException;
+
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.pt.PortugueseAnalyzer;
@@ -34,7 +38,6 @@ import lucene_resources.CorpusReader;
 import lucene_resources.SubtitleCorpusReader;
 import lucene_resources.SimpleQA;
 
-
 public class LuceneWrapper{
   private Analyzer analyzer;
   private Directory index;
@@ -45,36 +48,32 @@ public class LuceneWrapper{
 
   public static void main(String[] args) throws IOException{
     int flag = Integer.parseInt(args[0]);
+    String language = args[3];
+    String pathOfDb = args[6];
+    String corpusPath = args[1];
+    String query_normalized = args[2];
+    String pathOfIndex = args[4];
 
-    if (flag == 0){   //called from answers.py
-      String corpusPath = args[1];
-      String query_normalized = args[2];
-      String language = args[3];
-      String pathOfIndex = args[4];
-      String pathOfDb = args[6];
+    DB4OFILENAME =Paths.get("").toAbsolutePath().toString() + pathOfDb;
 
-      DB4DB4OFILENAME = Paths.get("").toAbsolutePath().toString() + pathOfDb;
+    LuceneWrapper lw = new LuceneWrapper();
+    lw.hitsPerQuery = Integer.parseInt(args[5]);
+    lw.db = Db4oEmbedded.openFile(DB4OFILENAME);
 
-      LuceneWrapper lw = new LuceneWrapper();
-      lw.hitsPerQuery = Integer.parseInt(args[5]);
-      // Lucene algorithm init
+    if (flag == 0){                         //Lucene init -- create index
+      System.out.println("\nINIT LUCENE\n");
       try {
           lw.initAnalyzer(language);
-          lw.index = lw.createIndex(lw.analyzer, pathOfIndex, corpusPath);
+          lw.createIndex(lw.analyzer, pathOfIndex, corpusPath);
       } catch (IOException e) {
           e.printStackTrace();
       }
-      IndexReader reader = DirectoryReader.open(lw.index);
-      lw.searcher = new IndexSearcher(reader);
-
-      lw.db = Db4oEmbedded.openFile(DB4OFILENAME);
-
-      lw.getCandidates(query_normalized);
     }
-
-    else{  //called from getPreviousQA -- flag is qaId
-      LuceneWrapper lw = new LuceneWrapper();
-      lw.db = Db4oEmbedded.openFile(DB4OFILENAME);
+    else if (flag == -2){                 //search
+      lw.initAnalyzer(language);
+      lw.getCandidates(query_normalized, pathOfIndex);
+    }
+    else{                                 //called from getPreviousQA -- flag is qaId
       SimpleQA simpleQA = lw.getSimpleQA(flag);
 
       File fileDir = new File("simpleQa.txt");
@@ -93,9 +92,6 @@ public class LuceneWrapper{
       writer.write("\n");
       writer.close();
     }
-
-
-
   }
 
   private void initAnalyzer(String language) {
@@ -106,9 +102,9 @@ public class LuceneWrapper{
       }
   }
 
-  public void getCandidates(String normalizedQuestion){
+  public void getCandidates(String normalizedQuestion, String pathOfIndex){
     try {
-        List<Document> luceneDocs = search(normalizedQuestion, this.hitsPerQuery);
+        List<Document> luceneDocs = search(normalizedQuestion, this.hitsPerQuery, pathOfIndex);
         loadLuceneResults(luceneDocs);
 
     } catch (IOException e) {
@@ -119,6 +115,7 @@ public class LuceneWrapper{
   }
 
   private void loadLuceneResults(List<Document> docList) throws IOException{
+    // write results to file so they can be read from python files
     File fileDir = new File("luceneresults.txt");
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileDir), "UTF-8"));
     for (Document d : docList) {
@@ -146,26 +143,36 @@ public class LuceneWrapper{
       return simpleQA;
   }
 
-  public List<Document> search(String inputQuestion, int hitsPerPage) throws IOException, ParseException {
+  public List<Document> search(String inputQuestion, int hitsPerPage, String pathOfIndex) throws IOException, ParseException {
+      File indexDirec = new File(pathOfIndex);
+      Directory index = MMapDirectory.open(indexDirec.toPath());
+  		IndexReader reader = DirectoryReader.open(index);
+  		IndexSearcher indexSearcher = new IndexSearcher(reader);
+
+  		Query q = new QueryParser("question", this.analyzer).parse(inputQuestion);
+
       TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
-      Query q = new QueryParser("question", this.analyzer).parse(inputQuestion);
-      this.searcher.search(q, collector);
+      indexSearcher.search(q, collector);
+
       ScoreDoc[] hits = collector.topDocs().scoreDocs;
       ArrayList<Document> docList = new ArrayList<>();
       for (ScoreDoc scoreDoc : hits) {
           int docId = scoreDoc.doc;
-          Document d = this.searcher.doc(docId);
+          Document d = indexSearcher.doc(docId);
           docList.add(d);
       }
       return docList;
-  }
 
-  public Directory createIndex(Analyzer analyzer, String indexDir, String corpusDir) throws IOException{
+  	}
+
+
+  public static void createIndex(Analyzer analyzer, String indexDir, String corpusDir) throws CorruptIndexException, LockObtainFailedException, IOException {
     File indexDirec = new File(indexDir);
     Directory index = MMapDirectory.open(indexDirec.toPath());
     IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
-    IndexWriter writer = new IndexWriter(index, config);
+		IndexWriter writer = new IndexWriter(index, config);
+
     writer.deleteAll(); //delete previous lucene files
 
     File dbFile = new File(DB4OFILENAME);
@@ -183,6 +190,5 @@ public class LuceneWrapper{
     //db4oConfig.file().readOnly(true);
     writer.close();
     db.close();
-    return index;
-  }
+	}
 }
