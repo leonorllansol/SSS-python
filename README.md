@@ -18,7 +18,7 @@ Download Apache Lucene's latest version, and the db4o jar available in https://g
 ## Compilation and building
 Running the script setup.sh will setup your java environment and compile the java files concerning Lucene. Run it using: 
 ```
-./setup.sh
+. setup.sh
 ```
 
 ## How to run
