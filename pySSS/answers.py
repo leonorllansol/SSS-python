@@ -83,14 +83,38 @@ class AbstractAnswerSelection:
 
             #get answer with highest score with evaluator by weighting all similarity measures
             final_sm_candidate = getFinalCandidate(highest_scored_candidates)
-            answers_per_evaluator.append((final_sm_candidate, evaluator.getWeight()))
+            answers_per_evaluator.append((final_sm_candidate, evaluator.getWeight(),evaluator.__class__.__name__))
         return answers_per_evaluator
+
+
+
+    def getEvaluatorsAnswersDict(self, query, candidates):
+        answers_per_evaluator = {}
+        for evaluator in self.evaluators:
+            #logging.info("evaluator: " + evaluator)
+            highest_scored_candidates = []
+            for similarityMeasure in self.similarityMeasures:
+                try:
+                    highest_candidate, highest_score = evaluator.score(similarityMeasure, query, candidates, self.conversation)
+                    highest_scored_candidates.append((highest_candidate, similarityMeasure.getWeight()))
+                    logging.info('\n')
+                    logging.info("score:")
+                    logging.info(highest_score)
+                    logging.info('\n')
+
+                except ValueError:
+                    highest_scored_candidates.append((configParser.getNoAnswerMessage(), similarityMeasure.getWeight()))
+                    
+            #get answer with highest score with evaluator by weighting all similarity measures
+            final_sm_candidate = getFinalCandidate(highest_scored_candidates)
+            answers_per_evaluator[evaluator.__class__.__name__] = final_sm_candidate
+        return answers_per_evaluator
+
 
 
 class HighestWeightedScoreSelection(AbstractAnswerSelection):
     def chooseAnswer(self, query, candidates):
         self.answers_per_evaluator = self.getEvaluatorsScores(query, candidates)
-
         logging.info("ANSWERS PER EVALUATOR")
         logging.info(self.answers_per_evaluator)
         final_candidate = max(self.answers_per_evaluator,key=itemgetter(1))[0]
@@ -107,6 +131,18 @@ class MostVotedSelection(AbstractAnswerSelection):
         return final_candidate
 '''
 # --- AUXILIAR ---
+
+
+class MultipleAnswerSelection(AbstractAnswerSelection):
+
+    #overriding original method
+    def provideAnswerWithCandidates(self, query, query_normalized, candidates):
+        answers_per_evaluator = self.getEvaluatorsAnswersDict(query_normalized,candidates)
+        return answers_per_evaluator
+
+
+
+
 
 def getCandidatesFromLuceneResults(query, lines):
     candidates = []

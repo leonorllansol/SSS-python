@@ -47,6 +47,10 @@ def getNormalizersPath():
     normalizerPath = mydoc.getElementsByTagName('normalizersPath')[0]
     return normalizerPath.firstChild.data
 
+def getExternalAgentsPath():
+    externalAgentsPath = mydoc.getElementsByTagName('externalAgentsPath')[0]
+    return externalAgentsPath.firstChild.data
+
 def getLanguage():
     language = mydoc.getElementsByTagName('language')[0]
     return language.firstChild.data
@@ -67,3 +71,13 @@ def getStopWordsPath():
 def getReferencesInputSize():
     inputSize = mydoc.getElementsByTagName('inputSize')[0]
     return inputSize.firstChild.data
+
+
+def getDefaultAgentsMode():
+    defaultAgentsMode = mydoc.getElementsByTagName('defaultAgentsMode')[0]
+    return defaultAgentsMode.firstChild.data
+
+
+def getDecisionMethod():
+    decisionMethod = mydoc.getElementsByTagName('decisionMethod')[0]
+    return decisionMethod.firstChild.data

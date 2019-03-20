@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <mainClass>MixAgent</mainClass>
+    <receiveLuceneCandidates>true</receiveLuceneCandidates>
+    <questionSimValue>0.5</questionSimValue>
+    <answerSimValue>0.5</answerSimValue>
+</config>

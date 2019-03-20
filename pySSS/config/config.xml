@@ -12,6 +12,7 @@
     <corpusPath>corpus</corpusPath>
     <normalizersPath>resources/normalizers/puncts.txt</normalizersPath>
     <stopwords>resources/stopwords/portuguese_stop_smaller.txt</stopwords>
+    <externalAgentsPath>resources/externalAgents</externalAgentsPath>
   </paths>
 
   <normalizers>RemoveDiacriticalMarks</normalizers>
@@ -21,14 +22,27 @@
   <similarityMeasure name="Jaccard" weight="25"/>
   <similarityMeasure name="EditDistance" weight="50"/>
 
+
   <!-- Answer selection criteria -->
   <criteria>
     <criterion name="AnswerFrequency" weight="0"/>
-    <criterion name="AnswerSimilarityToUserQuestion" weight="0"/>
-    <criterion name="QuestionSimilarityToUserQuestion" weight="0"/>
+    <criterion name="AnswerSimilarityToUserQuestion" weight="30"/>
+    <criterion name="QuestionSimilarityToUserQuestion" weight="30"/>
     <criterion name="SimpleTimeDifference" weight="0"/>
-    <criterion name="SimpleConversationContext" weight="100" nPreviousInteractions="2"/>
+    <criterion name="SimpleConversationContext" weight="40" nPreviousInteractions="2"/>
   </criteria>
+
+
+  <!-- Take only above agents into account or use external agents as well [classic/multi] -->
+  <defaultAgentsMode>multi</defaultAgentsMode>
+
+
+  <!-- Decision method to use:
+          SimpleMajority - Most frequent answer given by the agents is the one delivered to the user
+  
+  -->
+  <decisionMethod>SimpleMajority</decisionMethod>
+
 
   <noAnswerFoundPT>Não sei responder a isso</noAnswerFoundPT> 
 

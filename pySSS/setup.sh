@@ -1,8 +1,8 @@
 #change to match lucene directory and version
-LUCENE_DIR=/home/pySSS/lucene
-LUCENE_VERSION=7.7.0
+LUCENE_DIR=/home/hawke/Work/SSS-python/lucene-7.7.1
+LUCENE_VERSION=7.7.1
 #change to match db4o directory
-DB4O_DIR=/home/pySSS/lib/db4olib/
+DB4O_DIR=/home/hawke/Work/SSS-python/
 
 export CLASSPATH=${LUCENE_DIR}/core/lucene-core-${LUCENE_VERSION}.jar:$CLASSPATH
 export CLASSPATH=${LUCENE_DIR}/demo/lucene-demo-${LUCENE_VERSION}.jar:$CLASSPATH
