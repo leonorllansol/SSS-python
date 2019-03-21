@@ -1,10 +1,25 @@
 from .FaqsAgent.FaqsAgent import FaqsAgent
 from .MixAgent.MixAgent import MixAgent
-from .AnswerSimAgent.AnswerSimAgent import AnswerSimAgent
+from .SimplestAgent.SimplestAgent import SimplestAgent
 from xml.dom import minidom
 from xml.dom.minidom import Node
 import os
 import re
+
+
+
+def agentHandler(configs):
+    mainClass = configs['mainClass']
+
+    if(mainClass == 'FaqsAgent'):
+        return FaqsAgent(configs)
+    
+    elif(mainClass == 'MixAgent'):
+        return MixAgent(configs)
+
+
+
+
 
 
 
@@ -28,23 +43,6 @@ def createExternalAgents(externalAgentsPath):
         externalAgents.append(agent)
     
     return externalAgents
-
-
-
-def agentHandler(configs):
-    mainClass = configs['mainClass']
-
-    if(mainClass == 'FaqsAgent'):
-        return FaqsAgent(configs)
-    
-    elif(mainClass == 'MixAgent'):
-        return MixAgent(configs)
-
-    elif(mainClass == 'AnswerSimAgent'):
-        return AnswerSimAgent()
-
-
-
 
 
 

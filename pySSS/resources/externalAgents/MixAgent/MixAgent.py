@@ -9,7 +9,7 @@ class MixAgent:
 
 
 
-    def getBestCandidate(self,userInput,candidates):
+    def requestAnswer(self,userInput,candidates):
         userInputWords = self.getWordSet(userInput)
         bestPair = candidates[0]
 

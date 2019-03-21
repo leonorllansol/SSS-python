@@ -30,7 +30,7 @@ class AgentManager:
 
         for agent in self.externalAgents:
             try:
-                answer = agent.getBestCandidate(userInput,candidates)
+                answer = agent.requestAnswer(userInput,candidates)
                 agentAnswers[agent.__class__.__name__] = answer
             except IndexError:
                 agentAnswers[agent.__class__.__name__] = configParser.getNoAnswerMessage()
@@ -55,33 +55,6 @@ class AgentManager:
 
         candidates = getCandidatesFromLuceneResults(query, strippedLines)
         return candidates
-
-
-
-    def decideBestAnswer(self,userInput,defaultAgentsAnswers):
-
-
-        candidates = self.generateLuceneCandidates(userInput)
-        agentAnswers, answerFrequency = self.getAgentsAnswer(userInput,candidates)
-
-        self.integrateDefaultAgentsAnswers(defaultAgentsAnswers,agentAnswers,answerFrequency)   #this call directly modifies the dictionaries
-
-        finalAnswer = max(answerFrequency.items(),key=operator.itemgetter(1))[0]
-
-        for agent in agentAnswers.keys():
-            print('Answer from agent ' + agent + ': \n' + agentAnswers[agent] + '\n')
-
-        return finalAnswer
-
-    
-
-    def integrateDefaultAgentsAnswers(self,defaultAgentsAnswers,agentAnswers,answerFrequency):
-        for i in range(len(defaultAgentsAnswers)):
-            
-            answer = defaultAgentsAnswers[i][0]
-            agentAnswers['Agent' + str(i)] = answer
-            answerFrequency[answer] = answerFrequency.get(answer,0) + 1
-
 
 
 

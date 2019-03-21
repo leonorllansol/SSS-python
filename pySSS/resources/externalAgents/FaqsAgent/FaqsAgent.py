@@ -7,7 +7,8 @@ class FaqsAgent:
         self.agentName = self.__class__.__name__
     
 
-    def getBestCandidate(self,userInput,candidates):
+    def requestAnswer(self,userInput,candidates):
+        
         userInputWords = self.getWordSet(userInput)
         bestPair = candidates[0]
         for c in candidates:
