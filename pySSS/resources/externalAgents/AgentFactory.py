@@ -1,6 +1,5 @@
 from .FaqsAgent.FaqsAgent import FaqsAgent
 from .MixAgent.MixAgent import MixAgent
-from .SimplestAgent.SimplestAgent import SimplestAgent
 from xml.dom import minidom
 from xml.dom.minidom import Node
 import os
