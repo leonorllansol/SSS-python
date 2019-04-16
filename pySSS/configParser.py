@@ -43,6 +43,14 @@ def getHitsPerQuery():
     hitsPerQuery = mydoc.getElementsByTagName('hitsPerQuery')[0]
     return hitsPerQuery.firstChild.data
 
+def usePreviouslyCreatedIndex():
+    usePreviouslyCreatedIndex = mydoc.getElementsByTagName('usePreviouslyCreatedIndex')[0]
+    if(usePreviouslyCreatedIndex.firstChild.data == 'true'):
+        return True
+    else:
+        return False
+
+
 def getNormalizersPath():
     normalizerPath = mydoc.getElementsByTagName('normalizersPath')[0]
     return normalizerPath.firstChild.data
@@ -81,3 +89,11 @@ def getDefaultAgentsMode():
 def getDecisionMethod():
     decisionMethod = mydoc.getElementsByTagName('decisionMethod')[0]
     return decisionMethod.firstChild.data
+
+
+def getPriorities():
+    agents = mydoc.getElementsByTagName('agent')
+    priorityDoc = {}
+    for agent in agents:
+        priorityDoc[agent.attributes['name'].value] = int(agent.attributes['priority'].value)
+    return priorityDoc

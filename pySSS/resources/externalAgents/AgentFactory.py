@@ -1,32 +1,38 @@
-from .FaqsAgent.FaqsAgent import FaqsAgent
-from .MixAgent.MixAgent import MixAgent
 from xml.dom import minidom
 from xml.dom.minidom import Node
 import os
 import re
+import importlib
+
+"""
+The AgentFactory module is a library used by the AgentManager class in order to discover and instantiate all available external agents.
+
+To perform that role, it searches for all config.xml files inside the externalAgents folder and uses these configuration files to import each of the agent classes into SSS.
+"""
 
 
+"""
+createExternalAgents(externalAgentsPath): Given the path location of the externalAgents folder, generates an array of agent objects corresponding to each of the available external agents
 
-def agentHandler(configs):
-    mainClass = configs['mainClass']
+externalAgentsPath: String containing the path of the externalAgents folder relative to pySSS. This value can be configured in the config.xml file through the parameter <externalAgentsPath>
 
-    if(mainClass == 'FaqsAgent'):
-        return FaqsAgent(configs)
-    
-    elif(mainClass == 'MixAgent'):
-        return MixAgent(configs)
+- Create externalAgents array in order to store an instance of each external agent
+- Obtain a configFiles array of strings corresponding to the paths of each external agent's config.xml
+- For each config.xml:
+    - Generate a configs dictionary where all of the given config.xml's parameters are stored, in the format {'parameterName': 'parameterContents'}
+    - Import the agent's main class through the mainClass parameter in the config.xml
+    - Initialize an instance of the agent
+    - Add that agent instance to the externalAgents array
 
+Return an externalAgents array containing each agent's instance
 
-
-
-
-
+"""
 
 def createExternalAgents(externalAgentsPath):
     externalAgents = [] 
 
     configFiles = getConfigFiles(externalAgentsPath)
-
+    disabledAgents = getDisabledAgents()
 
     for config in configFiles:
 
@@ -38,11 +44,35 @@ def createExternalAgents(externalAgentsPath):
                 if(x.nodeType == Node.ELEMENT_NODE):
                     configs[x.tagName] = x.firstChild.data
         
-        agent = agentHandler(configs)
-        externalAgents.append(agent)
+        if(len(configs) > 0):
+        
+            mainClass = configs['mainClass']
+            if(mainClass not in disabledAgents):
+                module = importlib.import_module('.' + mainClass + '.' + mainClass,'resources.externalAgents')
+                class_ = getattr(module,configs['mainClass'])
+            
+                agent = class_(configs)
+                externalAgents.append(agent)
     
     return externalAgents
 
+
+"""
+getConfigFiles(dirName): Auxiliary function with the role of searching for all config.xml files inside a given directory
+
+dirName: String corresponding to the path of the directory to search
+
+- Check all entities (directories and files) inside dirName
+- Create a configFiles array in order to store the path of each config.xml file
+- For each entity inside dirName:
+    - Check if the entity is a directory
+        - If it is, calls the function getConfigFiles on that directory (recursive searching)
+    - Check if the entity is a config.xml file
+        - If it is, append the path of the config.xml to the configFiles array
+
+Return the configFiles array containing all of the config.xml file paths
+
+"""
 
 
 def getConfigFiles(dirName):
@@ -55,3 +85,7 @@ def getConfigFiles(dirName):
         elif fullpath.endswith('config.xml'):
             configFiles.append(fullpath)
     return configFiles
+
+
+def getDisabledAgents():
+    return open('resources/externalAgents/disabledAgents.txt','r').read().splitlines()

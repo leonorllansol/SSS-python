@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <mainClass>EdgarAgent</mainClass>
+    <corpusPath>corpus/edgar</corpusPath>   
+    <dbPath>/resources/luceneDB/edgar/this.db.db4o</dbPath>
+    <indexPath>resources/luceneIndexes/edgar</indexPath>
+    <threshold>0.1</threshold>
+</config>
