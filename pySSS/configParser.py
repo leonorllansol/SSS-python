@@ -90,6 +90,19 @@ def getDecisionMethod():
     decisionMethod = mydoc.getElementsByTagName('decisionMethod')[0]
     return decisionMethod.firstChild.data
 
+def getSequentialQuestionTxtPath():
+    questionTxtFile = mydoc.getElementsByTagName('questionTxtFile')[0]
+    return questionTxtFile.firstChild.data
+
+def getSequentialTargetTxtPath():
+    sequentialTargetTxtFile = mydoc.getElementsByTagName('sequentialTargetTxtFile')[0]
+    return sequentialTargetTxtFile.firstChild.data
+
+def getAnswerAmount():
+    answerAmount = mydoc.getElementsByTagName('answerAmount')[0]
+    return int(answerAmount.firstChild.data)
+
+
 
 def getPriorities():
     agents = mydoc.getElementsByTagName('agent')

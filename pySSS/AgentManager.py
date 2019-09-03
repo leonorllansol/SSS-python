@@ -7,6 +7,7 @@ from resources.externalAgents import AgentFactory
 from xml.dom import minidom
 import subprocess
 import operator
+import time
 
 
 """
@@ -62,13 +63,36 @@ class AgentManager:
 
         agentAnswers = {}
 
+        t = time.time()
+        candidates = self.generateLuceneCandidates(userInput,"")
+        print("Candidate generation time: " + str(time.time() - t))
+
         for agent in self.externalAgents:
-            candidates = self.generateLuceneCandidates(userInput,agent)
+
+            agentTime = time.time()
+
             try:
-                answer = agent.requestAnswer(userInput,candidates)
-                agentAnswers[agent.__class__.__name__] = answer
+                if(agent.normalizeUserInput):
+                    userInput = Normalizer().applyNormalizations(userInput, self.normalizers)
+            except AttributeError:
+                pass
+                
+            try:
+                if(agent.corpusPath):
+                    answer = agent.requestAnswer(userInput,self.generateLuceneCandidates(userInput,agent))
+            except AttributeError:
+                if(len(candidates) > 0):
+                    answer = agent.requestAnswer(userInput,candidates)
+                else:
+                    answer = configParser.getNoAnswerMessage()
+
+            try:
+                agentAnswers[agent.agentName] = answer
             except IndexError:
-                agentAnswers[agent.__class__.__name__] = configParser.getNoAnswerMessage()
+                agentAnswers[agent.agentName] = configParser.getNoAnswerMessage()
+
+            print(agent.agentName + " execution time: " + str(time.time() - agentTime))
+
         return agentAnswers
 
 
@@ -103,14 +127,13 @@ class AgentManager:
         except AttributeError:
             dbPath = configParser.getDbPath()
 
-
         query_normalized = Normalizer().applyNormalizations(query, self.normalizers)
         list_args = ["java", "LuceneWrapper", "-2", corpusPath, query_normalized, configParser.getLanguage(), indexPath, configParser.getHitsPerQuery(), dbPath]
         sp1 = subprocess.Popen(list_args,shell=False)
         exitCode = sp1.wait()
 
 
-        luceneResults = open('luceneresults.txt', 'r')
+        luceneResults = open('luceneresults.txt', 'r',encoding='utf8')
         lines = luceneResults.readlines()
         strippedLines = []
         for line in lines:
@@ -134,6 +157,8 @@ Return lucene candidates in the form of a SimpleQA object array
 """
 def getCandidatesFromLuceneResults(query, lines):
     candidates = []
+    qaObjectTime = 0
+    appendTime = 0
     for i in range(0, len(lines), 6):
         previousQA = lines[i]
         question = lines[i+1]

@@ -56,9 +56,19 @@ public class LuceneWrapper{
 
     DB4OFILENAME =Paths.get("").toAbsolutePath().toString() + pathOfDb;
 
+    //System.out.println(DB4OFILENAME);
+
     LuceneWrapper lw = new LuceneWrapper();
     lw.hitsPerQuery = Integer.parseInt(args[5]);
-    lw.db = Db4oEmbedded.openFile(DB4OFILENAME);
+
+
+
+    EmbeddedConfiguration db4oConfig = Db4oEmbedded.newConfiguration();
+    db4oConfig.file().blockSize(8);
+    db4oConfig.file().lockDatabaseFile(false);
+
+
+    lw.db = Db4oEmbedded.openFile(db4oConfig, DB4OFILENAME);
 
     if (flag == 0){                         //Lucene init -- create index
       System.out.println("\nINIT LUCENE\n");
@@ -92,6 +102,7 @@ public class LuceneWrapper{
       writer.write("\n");
       writer.close();
     }
+    lw.db.close();
   }
 
   private void initAnalyzer(String language) {
@@ -177,11 +188,7 @@ public class LuceneWrapper{
 
     File dbFile = new File(DB4OFILENAME);
     dbFile.delete();
-
-    EmbeddedConfiguration db4oConfig = Db4oEmbedded.newConfiguration();
-    db4oConfig.file().blockSize(8);
-    db4oConfig.file().lockDatabaseFile(false);
-    ObjectContainer db = Db4oEmbedded.openFile(db4oConfig, DB4OFILENAME);
+    //ObjectContainer db = Db4oEmbedded.openFile(db4oConfig, DB4OFILENAME);
 
     File f = new File(corpusDir);
     File[] files = f.listFiles();
@@ -191,4 +198,5 @@ public class LuceneWrapper{
     writer.close();
     db.close();
 	}
+
 }

@@ -109,9 +109,9 @@ public class SubtitleCorpusReader extends CorpusReader {
 
     private String normalize(String query){
         String query_normalized = query.toLowerCase();
-        List<Character> puncts = Arrays.asList('"','.','?','!',',', '\n', '-');
-        for (Character sym : puncts){
-            query_normalized = query_normalized.replace(sym, Character.MIN_VALUE);
+        List<String> puncts = Arrays.asList(".","?","!",",", "\n", "-");
+        for (String sym : puncts){
+            query_normalized = query_normalized.replace(sym, "");
         }
         return query_normalized;
     }

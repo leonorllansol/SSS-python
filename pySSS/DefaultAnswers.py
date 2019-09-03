@@ -32,7 +32,6 @@ class AbstractAnswerSelection:
         luceneResults = open('luceneresults.txt', 'r')
 
         logging.info("Normalized query: " + query_normalized)
-
         lines = luceneResults.readlines()
         strippedLines = []
         for line in lines:

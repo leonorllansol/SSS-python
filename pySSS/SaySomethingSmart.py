@@ -1,5 +1,5 @@
 from DefaultAnswers import HighestWeightedScoreSelection, MultipleAnswerSelection
-import logging, sys
+import logging, sys, time
 import configParser, subprocess
 from DecisionMaker import DecisionMaker
 from AgentManager import AgentManager
@@ -24,6 +24,8 @@ def dialogue():
 
     if(defaultAgentsMode == 'multi'):
         multiAgentAnswerMode()
+    elif(defaultAgentsMode == 'sequential'):
+        sequentialConversationMode()
     else:
         classicDialogueMode()
         
@@ -64,6 +66,47 @@ def classicDialogueMode():
 
 
 
+def sequentialConversationMode():
+
+    multipleAnswerSelection = MultipleAnswerSelection()
+    agentManager = AgentManager()
+    decisionMaker = DecisionMaker(configParser.getDecisionMethod())
+    
+    questionsPath = configParser.getSequentialQuestionTxtPath()
+    targetPath = configParser.getSequentialTargetTxtPath()
+
+    f = open(questionsPath,'r',encoding='utf8')
+    questions = f.readlines()
+    f.close()
+
+    edgar_results = open(targetPath,'w',encoding='utf8')
+
+    for query in questions:
+
+        #defaultAgentsAnswers = multipleAnswerSelection.provideAnswer(query)
+        defaultAgentsAnswers = {}
+        externalAgentsAnswers = agentManager.generateAgentsAnswers(query)
+        # Both defaultAgentsAnswers and externalAgentsAnswers are dictionaries in the format {'agent1': 'answer1', 'agent2': 'answer2'}
+        
+
+        # Calling the DecisionMaker after having all of the answers stored in the above dictionaries
+        answer = decisionMaker.decideBestAnswer(defaultAgentsAnswers,externalAgentsAnswers)
+
+
+        print("Question:", query)
+        print("Final Answer:", answer)
+        print()
+
+        edgar_results.write("Q - " + query)
+        edgar_results.write("A - " + answer + '\n\n')
+
+
+    edgar_results.close()
+
+
+
+
+
 def multiAgentAnswerMode():
 
     """
@@ -81,6 +124,10 @@ def multiAgentAnswerMode():
     agentManager = AgentManager()
     decisionMaker = DecisionMaker(configParser.getDecisionMethod())
 
+    print("Current priority agents: ")
+    for agentName in configParser.getPriorities().keys():
+        print(agentName)
+    print()
 
     # SSS workloop
     while True:
@@ -88,17 +135,17 @@ def multiAgentAnswerMode():
 
         while (query == ""):
             query = input("Say something:\n")
+            print()
 
         if query == "exit":
             break;
 
-        logging.basicConfig(filename='log.txt', filemode='w', format='%(message)s', level=logging.INFO)
+        logging.basicConfig(filename='logs\\log' + time.strftime('%d%m%Y_%H%M%S') + '.txt', filemode='w', format='%(message)s', level=logging.INFO)
         logging.info("Query: " + query)
 
-
         #defaultAgentsAnswers = multipleAnswerSelection.provideAnswer(query)
-        #print(defaultAgentsAnswers)
         defaultAgentsAnswers = {}
+
         externalAgentsAnswers = agentManager.generateAgentsAnswers(query)
         # Both defaultAgentsAnswers and externalAgentsAnswers are dictionaries in the format {'agent1': 'answer1', 'agent2': 'answer2'}
         
@@ -107,8 +154,14 @@ def multiAgentAnswerMode():
         answer = decisionMaker.decideBestAnswer(defaultAgentsAnswers,externalAgentsAnswers)
 
 
+        logging.info("Query: " + query)
+        logging.info("Answer: " + answer)
+
+
+
         print("Question:", query)
         print("Final Answer:", answer)
+        print()
 
 
 

@@ -4,5 +4,6 @@
     <corpusPath>corpus/edgar</corpusPath>   
     <dbPath>/resources/luceneDB/edgar/this.db.db4o</dbPath>
     <indexPath>resources/luceneIndexes/edgar</indexPath>
-    <threshold>0.1</threshold>
+    <threshold>0.35</threshold>
+    <stopwords>resources/stopwords/edgar_stop.txt</stopwords>
 </config>

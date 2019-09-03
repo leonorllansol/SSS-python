@@ -48,11 +48,33 @@ def createExternalAgents(externalAgentsPath):
         
             mainClass = configs['mainClass']
             if(mainClass not in disabledAgents):
-                module = importlib.import_module('.' + mainClass + '.' + mainClass,'resources.externalAgents')
-                class_ = getattr(module,configs['mainClass'])
-            
-                agent = class_(configs)
-                externalAgents.append(agent)
+                try:
+                    agentAmount = int(configs['agentAmount'])
+                except KeyError:
+                    agentAmount = 1
+
+                try:
+                    variedParameters = configs['variedParameters'].split(',')
+                except KeyError:
+                    variedParameters = []
+
+
+                for a in range(agentAmount):
+                    agentConfigs = configs.copy()
+
+                    module = importlib.import_module('.' + mainClass + '.' + mainClass,'resources.externalAgents')
+                    class_ = getattr(module,agentConfigs['mainClass'])
+
+                    for param in variedParameters:
+                        paramValues = agentConfigs[param]
+                        agentConfigs[param] = paramValues.split(',')[a]
+
+                    agent = class_(agentConfigs)
+
+                    if(agentAmount > 1):
+                        agent.agentName += str(a+1)
+                    
+                    externalAgents.append(agent)
     
     return externalAgents
 

@@ -4,8 +4,8 @@
   <lucene>
     <dbPath>/resources/luceneDB/portuguese/this.db.db4o</dbPath>
     <indexPath>resources/luceneIndexes/portuguese</indexPath>
-    <hitsPerQuery>10</hitsPerQuery>
-    <usePreviouslyCreatedIndex>true</usePreviouslyCreatedIndex>
+    <hitsPerQuery>200</hitsPerQuery>
+    <usePreviouslyCreatedIndex>false</usePreviouslyCreatedIndex>
   </lucene>
 
   <paths>
@@ -26,41 +26,57 @@
   <criteria>
     <criterion name="AnswerFrequency" weight="0"/>
     <criterion name="AnswerSimilarityToUserQuestion" weight="30"/>
-    <criterion name="QuestionSimilarityToUserQuestion" weight="30"/>
+    <criterion name="QuestionSimilarityToUserQuestion" weight="70"/>
     <criterion name="SimpleTimeDifference" weight="0"/>
-    <criterion name="SimpleConversationContext" weight="40" nPreviousInteractions="2"/>
+    <criterion name="SimpleConversationContext" weight="0" nPreviousInteractions="2"/>
   </criteria>
 
 
   <!-- Parameters for the multiagent mode of SaySomethingSmart
 
-    defaultAgentsMode: Take only above agents into account or use external agents as well [classic/multi]
+    defaultAgentsMode: Running mode of the framework
+          classic     - Runs the default version of SSS (Lexical metrics, Magarreiro's)
+          multi       - Runs the multiagent system, prompting the user for dialogue
+          sequential  - Runs the multiagent system, reading questions from a text file sequentially 
 
     externalAgentsPath: Path to the externalAgents folder (default is resources/externalAgents)
 
     decisionMethod: Decision method to use. Current available decision methods are:
-      SimpleMajority - Most frequent answer given by the agents is the one delivered to the user
-      PrioritySystem - Agents have explicitly defined priorities;
-                     - If an agent with the highest priority can answer the user's query, that answer is delivered to the user and other agents' answers are ignored;
-                     - An agent with priority 1 has higher priority than an agent with priority 5;
-                     - If an agent is not specified in the priority settings, the system will assume that it has a lower priority than the specified agents
+      SimpleMajority                     Each agent sends a single answer, and the most frequent answer given by the agents is the one delivered to the user
+      PrioritySystem                     Agents have explicitly defined priorities (each agent sends a single answer);
+                                         If an agent with the highest priority can answer the user's query, that answer is delivered to the user and other agents' answers are ignored;
+                                         An agent with priority 1 has higher priority than an agent with priority 5;
+                                         If an agent is not specified in the priority settings, the system will assume that it has a lower priority than the specified agents
+      AgentMultiAnswers                  Similar to SimpleMajority, but each agent can deliver multiple possible answers instead of a single one;
+                                         however, the user still only receives a single response;
+      PrioritySystemMultiAnswers         Similar to PrioritySystem, but each agent can deliver multiple possible answers to be considered by the system instead of a single one;
+                                         however, the user still only receives a single response;
+      PrioritySystemDevelopmentMulti     Similar to PrioritySystemMultiAnswers, but the user receives multiple possible answers to the sent query;
+
+
+    answerAmount: Number of answers to be delivered to the user (1 is the default); this parameter is only considered if the PrioritySystemDevelopmentMulti decision method is active.
 
   -->
 
   <multiagentParameters>
     <defaultAgentsMode>multi</defaultAgentsMode>
     <externalAgentsPath>resources/externalAgents</externalAgentsPath>
-    <decisionMethod>PrioritySystem</decisionMethod>
+    <decisionMethod>PrioritySystemMultiAnswers</decisionMethod>
+    <answerAmount>1</answerAmount>
   </multiagentParameters>
+
+
+  <sequentialConversationParameters>
+    <questionTxtFile>resources/perguntas/testeEdgar/perguntas_edgar_palacio_100.txt</questionTxtFile>
+    <sequentialTargetTxtFile>edgar_standalone_palacio_answers.txt</sequentialTargetTxtFile>
+  </sequentialConversationParameters>
 
 
   <prioritySettings>
     <agent name="EdgarAgent" priority="1" />
-    <agent name="MixAgent" priority="2" />
   </prioritySettings>
 
-
-
   <noAnswerFoundPT>Não sei responder a isso</noAnswerFoundPT> 
+  <noAnswerFoundEN>I'm sorry, but I do not know how to answer that.</noAnswerFoundEN>
 
 </config>

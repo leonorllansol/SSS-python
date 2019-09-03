@@ -1,6 +1,7 @@
 import operator
 import configParser
-import sys
+import sys, logging
+import dialog
 
 """
 The DecisionMaker class is responsible for deciding the best answer to give to the user. 
@@ -85,18 +86,174 @@ class DecisionMaker:
             priorities = configParser.getPriorities()
 
             finalAnswer = ""
+            answerFrequency = {}
+
 
             for agent in mergedAgentAnswers.keys():
                 
+                logging.info('Answer from agent ' + agent + ': \n' + mergedAgentAnswers[agent] + '\n')
                 print('Answer from agent ' + agent + ': \n' + mergedAgentAnswers[agent] + '\n')
                 
                 if(finalAnswer == ""):
                     finalAnswer = (mergedAgentAnswers[agent],getPriority(agent,priorities))
+                    answerFrequency[mergedAgentAnswers[agent]] = answerFrequency.get(mergedAgentAnswers[agent],0) + 1
                 else:
                     if(getPriority(agent,priorities) < finalAnswer[1] and mergedAgentAnswers[agent] != configParser.getNoAnswerMessage()):
                         finalAnswer = (mergedAgentAnswers[agent],getPriority(agent,priorities))
-            
+                    else:
+                        answerFrequency[mergedAgentAnswers[agent]] = answerFrequency.get(mergedAgentAnswers[agent],0) + 1
+            if(finalAnswer[1] == sys.maxsize):
+                return max(answerFrequency.items(),key=operator.itemgetter(1))[0]
             return finalAnswer[0]
+
+
+
+
+        elif(self.decisionMethod == "AgentMultiAnswers"):
+            
+            
+            answerFrequency = {}
+
+            mergedAgentAnswers = {**defaultAgentsAnswers, **externalAgentsAnswers}
+
+            try:
+                for agent in mergedAgentAnswers.keys():
+
+                    if(mergedAgentAnswers[agent] is str):
+                        mergedAgentAnswers[agent] = [mergedAgentAnswers[agent]]
+
+                    print('Answers from agent ' + agent + ':')
+
+                    for answer in mergedAgentAnswers[agent]:
+                        answerFrequency[answer.getAnswer()] = answerFrequency.get(answer.getAnswer(),0) + 1/len(mergedAgentAnswers[agent])
+                        print(answer.getAnswer())
+
+
+                finalAnswer = max(answerFrequency.items(),key=operator.itemgetter(1))[0]
+
+                return finalAnswer
+            
+            except ValueError:
+                return configParser.getNoAnswerMessage()
+
+
+
+
+
+        elif(self.decisionMethod == "PrioritySystemMultiAnswers"):
+
+            mergedAgentAnswers = {**defaultAgentsAnswers, **externalAgentsAnswers}
+            priorities = configParser.getPriorities()
+
+            finalAnswer = ""
+            answerFrequency = {}
+
+
+            for agent in mergedAgentAnswers.keys():
+                
+                if(type(mergedAgentAnswers[agent]) is str):
+                    mergedAgentAnswers[agent] = [mergedAgentAnswers[agent]]
+
+                logging.info('Answers from agent ' + agent + ':')
+                print('Answers from agent ' + agent + ':')
+                
+                for answer in mergedAgentAnswers[agent]:
+                    if(type(answer) is dialog.SimpleQA.SimpleQA):
+                        answer = answer.getAnswer()
+
+                    if(finalAnswer == ""):
+                        if(answer != configParser.getNoAnswerMessage()):
+                            finalAnswer = (answer,getPriority(agent,priorities))
+                            answerFrequency[answer] = answerFrequency.get(answer,0) + 1
+                        else:
+                            break
+                    else:
+                        if(getPriority(agent,priorities) < finalAnswer[1] and answer != configParser.getNoAnswerMessage()):
+                            finalAnswer = (answer,getPriority(agent,priorities))
+                        else:
+                            answerFrequency[answer] = answerFrequency.get(answer,0) + 1
+                    logging.info(answer)
+                    print(answer)
+                
+                logging.info('\n')
+                print()
+
+            if(finalAnswer == ""):
+                return configParser.getNoAnswerMessage()
+            elif(finalAnswer[1] == sys.maxsize):
+                return max(answerFrequency.items(),key=operator.itemgetter(1))[0]
+            return finalAnswer[0]
+
+
+
+        elif(self.decisionMethod == "PrioritySystemDevelopmentMulti"):
+
+            mergedAgentAnswers = {**defaultAgentsAnswers, **externalAgentsAnswers}
+            priorities = configParser.getPriorities()
+
+            finalAnswer = ""
+            answerFrequency = {}
+
+
+            for agent in mergedAgentAnswers.keys():
+                
+                if(type(mergedAgentAnswers[agent]) is str):
+                    mergedAgentAnswers[agent] = [mergedAgentAnswers[agent]]
+
+                logging.info('Answers from agent ' + agent + ':')
+                print('Answers from agent ' + agent + ':')
+                
+                for answer in mergedAgentAnswers[agent]:
+                    if(type(answer) is dialog.SimpleQA.SimpleQA):
+                        answer = answer.getAnswer()
+
+                    if(finalAnswer == ""):
+                        if(answer != configParser.getNoAnswerMessage()):
+                            finalAnswer = [(answer,getPriority(agent,priorities))]
+                            answerFrequency[answer] = answerFrequency.get(answer,0) + 1
+                        else:
+                            break
+                    else:
+                        if(getPriority(agent,priorities) < finalAnswer[0][1] and answer != configParser.getNoAnswerMessage()):
+                            finalAnswer = [(answer,getPriority(agent,priorities))]
+                        elif(getPriority(agent,priorities) == finalAnswer[0][1] and answer != configParser.getNoAnswerMessage() and (answer,getPriority(agent,priorities)) not in finalAnswer):
+                            finalAnswer.append((answer,getPriority(agent,priorities)))
+                        else:
+                            answerFrequency[answer] = answerFrequency.get(answer,0) + 1
+                    logging.info(answer)
+                    print(answer)
+                
+                logging.info('\n')
+
+            if(finalAnswer == ""):
+                return configParser.getNoAnswerMessage()
+            elif(finalAnswer[0][1] == sys.maxsize):
+                if(configParser.getAnswerAmount() > 1):
+                    compositeAnswer = ""
+                    answerItems = sorted(answerFrequency.items(),key=operator.itemgetter(1),reverse=True)
+                    i = 0
+                    while(i < len(answerItems) and i < configParser.getAnswerAmount()):
+                        compositeAnswer += str(i + 1) + ": " + answerItems[i][0] + "\n"
+                        i += 1
+                    return compositeAnswer
+                return max(answerFrequency.items(),key=operator.itemgetter(1))[0]
+            else:
+                if(configParser.getAnswerAmount() > 1):
+                    compositeAnswer = ""
+                    answerItems = finalAnswer
+                    i = 0
+                    while(i < len(answerItems) and i < configParser.getAnswerAmount()):
+                        compositeAnswer += str(i + 1) + ": " + answerItems[i][0] + "\n"
+                        i += 1
+                    return compositeAnswer
+
+                return finalAnswer[0][0]
+
+
+
+
+
+
 
 
 
