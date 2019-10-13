@@ -32,11 +32,14 @@ class LevenshteinAgent:
             c.addScore(self.agentName,finalScore)
 
             
-            if(c.getAnswer()[len(c.getAnswer())-1] != '?'):
-                if(c.getScoreByEvaluator(self.agentName) < bestPairs[0].getScoreByEvaluator(self.agentName)):
-                    bestPairs = [c]
-                elif(c.getScoreByEvaluator(self.agentName) == bestPairs[0].getScoreByEvaluator(self.agentName)):
-                    bestPairs.append(c)
+            try:
+                if(c.getAnswer()[len(c.getAnswer())-1] != '?'):
+                    if(c.getScoreByEvaluator(self.agentName) < bestPairs[0].getScoreByEvaluator(self.agentName)):
+                        bestPairs = [c]
+                    elif(c.getScoreByEvaluator(self.agentName) == bestPairs[0].getScoreByEvaluator(self.agentName)):
+                        bestPairs.append(c)
+            except IndexError:
+                pass
 
         return bestPairs
 

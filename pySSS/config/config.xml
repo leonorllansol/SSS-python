@@ -1,17 +1,17 @@
 <config>
-  <language>portuguese</language>
+  <language>english</language>
 
   <lucene>
-    <dbPath>/resources/luceneDB/portuguese/this.db.db4o</dbPath>
-    <indexPath>resources/luceneIndexes/portuguese</indexPath>
-    <hitsPerQuery>200</hitsPerQuery>
-    <usePreviouslyCreatedIndex>false</usePreviouslyCreatedIndex>
+    <dbPath>/resources/luceneDB/train/this.db.db4o</dbPath>
+    <indexPath>resources/luceneIndexes/train</indexPath>
+    <hitsPerQuery>20</hitsPerQuery>
+    <usePreviouslyCreatedIndex>true</usePreviouslyCreatedIndex>
   </lucene>
 
   <paths>
-    <corpusPath>corpus/por</corpusPath>
+    <corpusPath>corpus/train</corpusPath>
     <normalizersPath>resources/normalizers/puncts.txt</normalizersPath>
-    <stopwords>resources/stopwords/portuguese_stop_smaller.txt</stopwords>
+    <stopwords>resources/stopwords/edgar_stop.txt</stopwords>
   </paths>
 
   <normalizers>RemoveDiacriticalMarks</normalizers>
@@ -37,7 +37,8 @@
     defaultAgentsMode: Running mode of the framework
           classic     - Runs the default version of SSS (Lexical metrics, Magarreiro's)
           multi       - Runs the multiagent system, prompting the user for dialogue
-          sequential  - Runs the multiagent system, reading questions from a text file sequentially 
+          sequential  - Runs the multiagent system, reading questions from a text file sequentially
+          learning    - Runs the learning system with the currently configured agents in order to learn the weights of each one 
 
     externalAgentsPath: Path to the externalAgents folder (default is resources/externalAgents)
 
@@ -59,22 +60,33 @@
   -->
 
   <multiagentParameters>
-    <defaultAgentsMode>multi</defaultAgentsMode>
+    <defaultAgentsMode>learning</defaultAgentsMode>
     <externalAgentsPath>resources/externalAgents</externalAgentsPath>
-    <decisionMethod>PrioritySystemMultiAnswers</decisionMethod>
+    <decisionMethod>SimpleMajority</decisionMethod>
     <answerAmount>1</answerAmount>
   </multiagentParameters>
-
 
   <sequentialConversationParameters>
     <questionTxtFile>resources/perguntas/testeEdgar/perguntas_edgar_palacio_100.txt</questionTxtFile>
     <sequentialTargetTxtFile>edgar_standalone_palacio_answers.txt</sequentialTargetTxtFile>
   </sequentialConversationParameters>
+  
 
 
   <prioritySettings>
-    <agent name="EdgarAgent" priority="1" />
   </prioritySettings>
+
+
+  <learning>
+    <interactions>resources/learning/cmdc/movie_conversations.txt</interactions>
+    <lines>resources/learning/cmdc/movie_lines.txt</lines>
+    <inputSize>1000</inputSize>
+    <decimalPlaces>0</decimalPlaces>
+    <etaFactor>4</etaFactor>
+    <strategy>BestCandidate</strategy>
+  </learning>
+
+
 
   <noAnswerFoundPT>Não sei responder a isso</noAnswerFoundPT> 
   <noAnswerFoundEN>I'm sorry, but I do not know how to answer that.</noAnswerFoundEN>

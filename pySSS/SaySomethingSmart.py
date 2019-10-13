@@ -3,6 +3,7 @@ import logging, sys, time
 import configParser, subprocess
 from DecisionMaker import DecisionMaker
 from AgentManager import AgentManager
+from WeightedMajority import WeightedMajority
 
 def dialogue():
 
@@ -26,6 +27,8 @@ def dialogue():
         multiAgentAnswerMode()
     elif(defaultAgentsMode == 'sequential'):
         sequentialConversationMode()
+    elif(defaultAgentsMode == 'learning'):
+        learningMode()
     else:
         classicDialogueMode()
         
@@ -124,10 +127,11 @@ def multiAgentAnswerMode():
     agentManager = AgentManager()
     decisionMaker = DecisionMaker(configParser.getDecisionMethod())
 
-    print("Current priority agents: ")
-    for agentName in configParser.getPriorities().keys():
-        print(agentName)
-    print()
+    if("PrioritySystem" in configParser.getDecisionMethod()):
+        print("Current priority agents (whose answers will be prioritized): ")
+        for agentName in configParser.getPriorities().keys():
+            print(agentName)
+        print()
 
     # SSS workloop
     while True:
@@ -140,7 +144,7 @@ def multiAgentAnswerMode():
         if query == "exit":
             break;
 
-        logging.basicConfig(filename='logs\\log' + time.strftime('%d%m%Y_%H%M%S') + '.txt', filemode='w', format='%(message)s', level=logging.INFO)
+        logging.basicConfig(filename='logs/log' + time.strftime('%d%m%Y_%H%M%S') + '.txt', filemode='w', format='%(message)s', level=logging.INFO)
         logging.info("Query: " + query)
 
         #defaultAgentsAnswers = multipleAnswerSelection.provideAnswer(query)
@@ -158,13 +162,15 @@ def multiAgentAnswerMode():
         logging.info("Answer: " + answer)
 
 
-
+        print()
         print("Question:", query)
         print("Final Answer:", answer)
         print()
 
 
-
+def learningMode():
+    wm = WeightedMajority()
+    wm.learnWeights()
 
 
 

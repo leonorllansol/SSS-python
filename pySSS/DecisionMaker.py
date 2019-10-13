@@ -67,9 +67,17 @@ class DecisionMaker:
 
             try:
                 for agent in mergedAgentAnswers.keys():
+
+                    if(type(mergedAgentAnswers[agent]) is list):
+                        mergedAgentAnswers[agent] = mergedAgentAnswers[agent][0]
+
                     answer = mergedAgentAnswers[agent]
+
+                    if(type(answer) is dialog.SimpleQA.SimpleQA):
+                        answer = answer.getAnswer()
+
                     answerFrequency[answer] = answerFrequency.get(answer,0) + 1
-                    print('Answer from agent ' + agent + ': \n' + mergedAgentAnswers[agent] + '\n')            
+                    print('Answer from agent ' + agent + ': \n' + answer + '\n')            
 
 
                 finalAnswer = max(answerFrequency.items(),key=operator.itemgetter(1))[0]
@@ -118,15 +126,16 @@ class DecisionMaker:
 
             try:
                 for agent in mergedAgentAnswers.keys():
-
-                    if(mergedAgentAnswers[agent] is str):
+                    if(type(mergedAgentAnswers[agent]) is str):
                         mergedAgentAnswers[agent] = [mergedAgentAnswers[agent]]
 
                     print('Answers from agent ' + agent + ':')
 
                     for answer in mergedAgentAnswers[agent]:
-                        answerFrequency[answer.getAnswer()] = answerFrequency.get(answer.getAnswer(),0) + 1/len(mergedAgentAnswers[agent])
-                        print(answer.getAnswer())
+                        if(type(answer) is dialog.SimpleQA.SimpleQA):
+                            answer = answer.getAnswer()
+                        answerFrequency[answer] = answerFrequency.get(answer,0) + 1/len(mergedAgentAnswers[agent])
+                        print(answer)
 
 
                 finalAnswer = max(answerFrequency.items(),key=operator.itemgetter(1))[0]
@@ -248,12 +257,7 @@ class DecisionMaker:
                     return compositeAnswer
 
                 return finalAnswer[0][0]
-
-
-
-
-
-
+        
 
 
 

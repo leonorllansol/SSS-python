@@ -75,12 +75,6 @@ def getStopWordsPath():
     stopWordsPath = mydoc.getElementsByTagName('stopwords')[0]
     return stopWordsPath.firstChild.data
 
-
-def getReferencesInputSize():
-    inputSize = mydoc.getElementsByTagName('inputSize')[0]
-    return inputSize.firstChild.data
-
-
 def getDefaultAgentsMode():
     defaultAgentsMode = mydoc.getElementsByTagName('defaultAgentsMode')[0]
     return defaultAgentsMode.firstChild.data
@@ -101,6 +95,34 @@ def getSequentialTargetTxtPath():
 def getAnswerAmount():
     answerAmount = mydoc.getElementsByTagName('answerAmount')[0]
     return int(answerAmount.firstChild.data)
+
+
+def getInteractionsPath():
+    interactionsPath = mydoc.getElementsByTagName('interactions')[0]
+    return interactionsPath.firstChild.data
+
+def getLinesPath():
+    linesPath = mydoc.getElementsByTagName('lines')[0]
+    return linesPath.firstChild.data
+
+def getInputSize():
+    inputSize = mydoc.getElementsByTagName('inputSize')[0]
+    return int(inputSize.firstChild.data)
+
+def getDecimalPlaces():
+    decimalPlaces = mydoc.getElementsByTagName('decimalPlaces')[0]
+    return int(decimalPlaces.firstChild.data)
+
+def getEtaFactor():
+    etaFactor = mydoc.getElementsByTagName('etaFactor')[0]
+    return int(etaFactor.firstChild.data)
+
+def getLearningStrategy():
+    learningStrategy = mydoc.getElementsByTagName('strategy')[0]
+    return learningStrategy.firstChild.data
+
+
+
 
 
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <mainClass>EdgarEngAgent</mainClass>
+    <corpusPath>corpus/edgar-eng</corpusPath>   
+    <dbPath>/resources/luceneDB/edgar-eng/this.db.db4o</dbPath>
+    <indexPath>resources/luceneIndexes/edgar-eng</indexPath>
+    <threshold>0.35</threshold>
+    <stopwords>resources/stopwords/edgar_stop.txt</stopwords>
+</config>

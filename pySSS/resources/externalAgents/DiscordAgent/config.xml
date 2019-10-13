@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <mainClass>DiscordAgent</mainClass>
+    <jsonPath>C:\Users\Linus\Documents\Escola\Tese_Updated\SSS-python\pySSS\learningAgentData.json</jsonPath>
+</config>
