@@ -8,7 +8,6 @@ numpy.set_printoptions(threshold=sys.maxsize)
 
 class CosineAgent:
     def __init__(self,configs,indexval=''):
-        self.useLucene = configs['receiveLuceneCandidates']          #string 'true' ou 'false'; n é convertido para bool
         self.agentName = self.__class__.__name__
         self.questionSimValue = float(configs['questionSimValue'])
         self.answerSimValue = float(configs['answerSimValue'])
@@ -45,7 +44,7 @@ class CosineAgent:
             c.addScore(self.agentName,finalScore)
 
             try:
-                if(c.getAnswer()[len(c.getAnswer())-1] != '?'):
+                if(c.getAnswer()[len(c.getAnswer())-1] != '?' and c != bestPairs[0]):
                     if(c.getScoreByEvaluator(self.agentName) > bestPairs[0].getScoreByEvaluator(self.agentName)):
                         bestPairs = [c]
                     elif(c.getScoreByEvaluator(self.agentName) == bestPairs[0].getScoreByEvaluator(self.agentName)):

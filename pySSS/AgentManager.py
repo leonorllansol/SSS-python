@@ -8,6 +8,7 @@ from xml.dom import minidom
 import subprocess
 import operator
 import time
+import DocumentManager
 
 
 """
@@ -64,8 +65,10 @@ class AgentManager:
         agentAnswers = {}
 
         t = time.time()
-        candidates = self.generateLuceneCandidates(userInput,"")
-        #print("Candidate generation time: " + str(time.time() - t))
+        
+        candidates = DocumentManager.generateCandidates(userInput)
+
+        print("Candidate generation time: " + str(time.time() - t))
 
         for agent in self.externalAgents:
 
@@ -76,10 +79,13 @@ class AgentManager:
                     userInput = Normalizer().applyNormalizations(userInput, self.normalizers)
             except AttributeError:
                 pass
-                
+
             try:
                 if(agent.corpusPath):
-                    answer = agent.requestAnswer(userInput,self.generateLuceneCandidates(userInput,agent))
+                    candidates = DocumentManager.generateCandidates(userInput,indexPath=agent.indexPath,corpusPath=agent.corpusPath)
+                    answer = agent.requestAnswer(userInput,candidates)
+                    candidates = DocumentManager.generateCandidates(userInput)
+                    
             except AttributeError:
                 if(len(candidates) > 0):
                     answer = agent.requestAnswer(userInput,candidates)
@@ -111,7 +117,9 @@ class AgentManager:
 
 
     Return lucene candidates in the form of a SimpleQA object array
-    """
+    
+
+
     def generateLuceneCandidates(self,query,agent):
 
         try:
@@ -134,7 +142,7 @@ class AgentManager:
         sp1 = subprocess.Popen(list_args,shell=False)
         exitCode = sp1.wait()
 
-        luceneResults = open('luceneresults.txt', 'r',encoding='utf8')
+        luceneResults = open('luceneresults.txt', 'r', encoding='utf8')
         lines = luceneResults.readlines()
         strippedLines = []
         for line in lines:
@@ -147,8 +155,6 @@ class AgentManager:
         return candidates
 
 
-
-    '''
 
     generateAgentsAnswersFixedCandidates(self, userInput, candidates): generates the answers for each agent and returns them in the form of a dictionary
 
@@ -163,11 +169,18 @@ class AgentManager:
     Key (String): Name of the agent
     Value (String): Answer of the agent
 
-    '''
+    """
 
     def generateAgentsAnswersFixedCandidates(self, userInput, candidates):
 
+        #print('++++++++++++++++++')
+        #for c in candidates:            
+        #    print(c.getAnswer())
+        #print('++++++++++++++++++')
+
+
         agentAnswers = {}
+        additionalAnswers = []
 
         t = time.time()
         for agent in self.externalAgents:
@@ -181,8 +194,20 @@ class AgentManager:
                 pass
             
             answer = agent.requestAnswer(userInput,candidates)
-            
+            #print(answer)
+            #print(agent.agentName)
+            #for a in answer:
+            #    print(a.getAnswer())
+            #print('--------------------*')
+
             try:
+                if(type(answer) == str):
+                    answer = [SimpleQA("","","",answer,answer,0)]
+                    for a in self.externalAgents:
+                        answer[0].scores[a.agentName] = 0
+                    answer[0].scores[agent.agentName] = 1
+                    additionalAnswers.append(answer[0])
+
                 if(answer == [] or answer == ""):
                     agentAnswers[agent.agentName] = configParser.getNoAnswerMessage()
                 else:
@@ -190,8 +215,10 @@ class AgentManager:
             except IndexError:
                 agentAnswers[agent.agentName] = configParser.getNoAnswerMessage()
 
+        for ad in additionalAnswers:
+            candidates.append(ad)
+            
             #print(agent.agentName + " execution time: " + str(time.time() - agentTime))
-
         return agentAnswers
 
 
@@ -201,7 +228,9 @@ class AgentManager:
 
 
 """
-getCandidatesFromLuceneResults(query, lines): Converts Lucene information into SimpleQA objects
+getCandidatesFromLuceneResults(query, lines): 
+
+Converts Lucene information into SimpleQA objects
 
 query: String containing the user's input
 lines: Array of Strings containing the information regarding Lucene's best candidates
@@ -209,7 +238,8 @@ lines: Array of Strings containing the information regarding Lucene's best candi
 - Append the new SimpleQA object to the candidates array
 
 Return lucene candidates in the form of a SimpleQA object array
-"""
+
+
 def getCandidatesFromLuceneResults(query, lines):
     candidates = []
     qaObjectTime = 0
@@ -225,6 +255,7 @@ def getCandidatesFromLuceneResults(query, lines):
         candidates.append(qa)
     return candidates
     
+"""
 
 
 

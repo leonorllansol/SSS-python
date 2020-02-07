@@ -1,4 +1,4 @@
-from similarity.SimilarityMeasure import Jaccard
+from similarity.SimilarityMeasure import CosineSimilarity, Jaccard
 import math
 
 class WM_BestCandidate:
@@ -20,13 +20,13 @@ class WM_BestCandidate:
 
         for c in candidates:
             candidateScore = c.getScoreByEvaluator(agentName)
-
             if(candidateScore > bestScore):
                 bestScore = candidateScore
                 bestCandidateAnswer = c.getAnswer()
 
+
         newReward = self.rewardFunction(reference, bestCandidateAnswer)
-        
+
         return (round(newReward * (10 ** self.decimalPlaces) / (10 ** self.decimalPlaces)))
     
 
@@ -34,9 +34,11 @@ class WM_BestCandidate:
         return math.exp(self.zeta * reward)
 
 
-    def rewardFunction(self, reference, bestCandidate):        
+    def rewardFunction(self, reference, bestCandidate):    
+        #print(bestCandidate)    
         #measure is jaccard distance, best result is 0
         similarity = 1 - self.similarityMeasure.distance(bestCandidate, reference)
         reward = min(similarity + 0.001, 1)
+        #print(reward)
         return reward
 

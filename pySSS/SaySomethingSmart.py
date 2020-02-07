@@ -4,6 +4,7 @@ import configParser, subprocess
 from DecisionMaker import DecisionMaker
 from AgentManager import AgentManager
 from WeightedMajority import WeightedMajority
+import DocumentManager
 
 def dialogue():
 
@@ -11,17 +12,13 @@ def dialogue():
     Main startup function for the SaySomethingSmart framework.
     - Verifies the desired workmode by checking the defaultAgentsMode parameter in the config.xml
     - If the defaultAgentsMode is "multi", calls the multiagent SSS framework; else, calls the "legacy" version of SSS with only its origin agents
-    - Calls the LuceneWrapper class in order to index the given corpus
+    - Calls the DocumentManager functions in order to index the given corpus
     """
 
     defaultAgentsMode = configParser.getDefaultAgentsMode()
-
-    if(not configParser.usePreviouslyCreatedIndex()):
-        list_args = ["java", "LuceneWrapper", "0", configParser.getCorpusPath(), "", configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
-        sp1 = subprocess.Popen(list_args,shell=False)
     
-        exitCode = sp1.wait()
-
+    if(not configParser.usePreviouslyCreatedIndex()):
+        DocumentManager.createIndex(configParser.getIndexPath(), configParser.getCorpusPath()) 
 
     if(defaultAgentsMode == 'multi'):
         multiAgentAnswerMode()
@@ -29,6 +26,8 @@ def dialogue():
         sequentialConversationMode()
     elif(defaultAgentsMode == 'learning'):
         learningMode()
+    elif(defaultAgentsMode == 'evaluation'):
+        evaluationMode()
     else:
         classicDialogueMode()
         
@@ -172,12 +171,16 @@ def learningMode():
     wm = WeightedMajority()
     wm.learnWeights()
 
+def evaluationMode():
+    agentWeights = configParser.getWeightResults()
+    if(agentWeights == {}):
+        print("Please set the weight dictionary in the configuration file according to the results obtained in the learning process (e.g: {'CosineAgent1': 24, 'CosineAgent2': 67, 'CosineAgent3': 9}).")
+        return
+    else:
+        wm = WeightedMajority()
+        wm.evaluation(agentWeights)
 
 
 
 if __name__ == "__main__":
     dialogue()
-
-
-#TODO mode evaluation
-#TODO mode learning

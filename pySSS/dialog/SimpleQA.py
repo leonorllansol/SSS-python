@@ -14,25 +14,6 @@ class SimpleQA:
     def getDiff(self):
         return self.diff
 
-    def getPreviousQA(self):
-        if int(self.previousQA) != -1:
-            #getSimpleQA from LuceneWrapper
-            list_args = ["java", "LuceneWrapper", self.previousQA, configParser.getCorpusPath(), "", configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
-            sp1 = subprocess.Popen(list_args,shell=False)
-            exitCode = sp1.wait()
-
-            newSimpleQa = open('simpleQa.txt', 'r')
-
-            lines = newSimpleQa.readlines()
-            strippedLines = []
-            for line in lines:
-                strippedLines.append(line.strip('\n'))
-
-            newQa = SimpleQA(strippedLines[0], strippedLines[1], strippedLines[2], strippedLines[3], strippedLines[4], strippedLines[5])
-            return newQa
-        else:
-            return -1 #no previousQA
-
     def getQuestion(self):
         return self.question
 

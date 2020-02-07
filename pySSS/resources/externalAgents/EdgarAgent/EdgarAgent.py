@@ -6,7 +6,6 @@ class EdgarAgent:
     def __init__(self,configs):
         self.agentName = self.__class__.__name__
         self.corpusPath = configs['corpusPath']
-        self.dbPath = configs['dbPath']
         self.indexPath = configs['indexPath']
         self.threshold = float(configs['threshold'])
         self.stopwordsPath = configs['stopwords']

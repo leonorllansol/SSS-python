@@ -12,7 +12,7 @@ class ReferenceCorpusParser:
 
         references = []
         linesMap, linesIndex = self.mapMovieLines()
-        dialogues = open(self.corpusDialoguesPath, 'r', encoding='utf8')
+        dialogues = open(self.corpusDialoguesPath, 'r', encoding='iso-8859-1')
         id = 0
 
         for line in dialogues.readlines():
@@ -45,7 +45,7 @@ class ReferenceCorpusParser:
     def mapMovieLines(self):
         linesMap = {}
         linesIndex = {}
-        lines = open(self.corpusLinesPath, 'r', encoding='utf8')
+        lines = open(self.corpusLinesPath, 'r', encoding='iso-8859-1')
         num = 0
 
         for l in lines.readlines():

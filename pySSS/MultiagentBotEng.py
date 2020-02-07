@@ -9,16 +9,14 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 import TokenEng
 from discord import utils
+import DocumentManager
 
 
 
 defaultAgentsMode = configParser.getDefaultAgentsMode()
 
 if(not configParser.usePreviouslyCreatedIndex()):
-    list_args = ["java", "LuceneWrapper", "0", configParser.getCorpusPath(), "", configParser.getLanguage(), configParser.getIndexPath(), configParser.getHitsPerQuery(), configParser.getDbPath()]
-    sp1 = subprocess.Popen(list_args,shell=False)
-
-    exitCode = sp1.wait()
+    DocumentManager.createIndex(configParser.getIndexPath(), configParser.getCorpusPath()) 
     
     
         

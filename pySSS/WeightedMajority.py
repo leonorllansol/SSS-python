@@ -7,6 +7,7 @@ from texttools.normalizers import normalizerFactory
 from texttools.normalizers.normalizer import Normalizer
 from texttools.ReferenceCorpusParser import ReferenceCorpusParser
 import operator
+import DocumentManager
 
 class WeightedMajority:
 
@@ -16,6 +17,11 @@ class WeightedMajority:
         self.agents = self.agentManager.externalAgents
         self.strategy = self.pickStrategy()
         self.normalizers = normalizerFactory.createNormalizers(configParser.getNormalizers())
+        self.inputSize = configParser.getInputSize()
+        print('Current strategy: ' + configParser.getLearningStrategy())
+        print('Current reward function basis: ' + type(self.strategy.similarityMeasure).__name__)
+        print('Current decimal places (alpha): ' + str(configParser.getDecimalPlaces()))
+        print('Current eta factor (beta): ' + str(configParser.getEtaFactor()))
 
 
     def learnWeights(self):
@@ -26,6 +32,11 @@ class WeightedMajority:
         for agent in self.agents:
             weights[agent.agentName] = 1/len(self.agents)
             rewards[agent.agentName] = 0
+
+        initialWeights = configParser.getInitialWeights()
+        
+        if(initialWeights.keys() == weights.keys()):
+            weights = initialWeights
 
         t = 1
 
@@ -39,7 +50,7 @@ class WeightedMajority:
             
             nquery = Normalizer().applyNormalizations(ref.trigger, self.normalizers)
             
-            candidates = self.agentManager.generateLuceneCandidates(nquery,"")
+            candidates = self.DocumentManager.generateCandidates(nquery)
             
             if(len(candidates) == 0):
                 continue
@@ -47,14 +58,17 @@ class WeightedMajority:
             answers = self.agentManager.generateAgentsAnswersFixedCandidates(nquery, candidates)
 
             votedAnswer = self.mostVotedSelection(weights, answers)
-            print(votedAnswer)
+            print("Agents Answer: " + votedAnswer)
 
             totalWeight = 0
 
             for agent in self.agents:
+                #print(agent.agentName)
                 rewards[agent.agentName] += self.strategy.computeReward(candidates, ref.answer, agent.agentName)
                 weights[agent.agentName] += self.strategy.updateWeight(rewards[agent.agentName])
                 totalWeight += weights[agent.agentName]
+                #print('+++++++')
+                
             
             #distinct for loops because totalWeight is still being updated in the first loop
             for agent in self.agents:
@@ -63,8 +77,12 @@ class WeightedMajority:
             finalWeights = weights
 
             print(finalWeights)
+            print()
             
             t += 1
+
+            if(t > self.inputSize):
+                break
    
 
 
@@ -72,7 +90,8 @@ class WeightedMajority:
     def mostVotedSelection(self, weights, answers):
         
         mostVoted = {}
-
+        mostVoted[configParser.getNoAnswerMessage()] = 0
+        #print(answers)
         #we're assuming that all answers are represented by SimpleQA objects
         for agent in weights.keys():
 
@@ -81,16 +100,27 @@ class WeightedMajority:
 
             #assuming that the agentName attribute always exists for any agent
 
-            bestCandidate = answers[agent]
-            if(type(bestCandidate) is list):
-                bestCandidate = bestCandidate[0]
-            bestAnswer = bestCandidate.getAnswer()
-            bestScore = bestCandidate.getScoreByEvaluator(agent)
-            if(bestAnswer in mostVoted.keys()):
-                weightedVote += mostVoted[bestAnswer]
+            bestCandidates = answers[agent]
             
-            mostVoted[bestAnswer] = weightedVote
+            #print('-----------------')
+            #print(agent)
+
+            for bestCandidate in bestCandidates:
+
+            #if(type(bestCandidate) is list):
+            #    bestCandidate = bestCandidate[0]
+                try:
+                    bestAnswer = bestCandidate.getAnswer()
+                    bestScore = bestCandidate.getScoreByEvaluator(agent)
+                    if(bestAnswer in mostVoted.keys()):
+                        mostVoted[bestAnswer] += weightedVote
+                    else:
+                        mostVoted[bestAnswer] = weightedVote
+                except AttributeError:
+                    mostVoted[configParser.getNoAnswerMessage()] += 0.000000001   #low value; if no agents can answer the query, the no answer message will be the most voted
         
+        
+        #print(mostVoted)
         return max(mostVoted.items(), key=operator.itemgetter(1))[0]
 
 
@@ -107,6 +137,7 @@ class WeightedMajority:
 
 
     def parseReferenceCorpus(self):
+        
         interactionsPath = configParser.getInteractionsPath()
         linesPath = configParser.getLinesPath()
         inputSize = configParser.getInputSize()
@@ -114,3 +145,35 @@ class WeightedMajority:
         rcp = ReferenceCorpusParser(interactionsPath,linesPath,inputSize)
 
         return rcp.parse()
+
+
+    def evaluation(self, agentWeights):
+        accuracy = 0
+        t = 1
+        for ref in self.references:
+            
+            nquery = Normalizer().applyNormalizations(ref.trigger, self.normalizers)    
+            candidates = self.DocumentManager.generateCandidates(nquery)
+            
+            if(len(candidates) == 0):
+                continue
+
+            answers = self.agentManager.generateAgentsAnswersFixedCandidates(nquery, candidates)
+            votedAnswer = self.mostVotedSelection(agentWeights, answers)
+            
+            print('Reference: ' + ref.answer)
+            print('Voted Answer: ' + votedAnswer)
+
+            if(ref.answer.split() == votedAnswer.split()):
+                accuracy += 1
+                print('Accuracy: ' + str(accuracy))
+
+            t += 1
+            if(t > self.inputSize):
+                break
+        
+        print('Accuracy before normalization: ' + str(accuracy))
+        accuracy = (accuracy / self.inputSize) * 100
+
+        print('Accuracy: ' + str(accuracy))
+        

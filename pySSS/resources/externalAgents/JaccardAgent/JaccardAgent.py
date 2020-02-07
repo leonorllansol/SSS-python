@@ -2,7 +2,6 @@
 
 class JaccardAgent:
     def __init__(self,configs,indexval=''):
-        self.useLucene = configs['receiveLuceneCandidates']          #string 'true' ou 'false'; n é convertido para bool
         self.agentName = self.__class__.__name__
         self.questionSimValue = float(configs['questionSimValue'])
         self.answerSimValue = float(configs['answerSimValue'])
@@ -12,7 +11,6 @@ class JaccardAgent:
 
 
     def requestAnswer(self,userInput,candidates):
-
 
         userInputWords = self.getWordSet(userInput)
         userInputWords_WoStopwords = self.getStringListWithoutStopWords(userInputWords)
@@ -27,16 +25,19 @@ class JaccardAgent:
 
             #questionScore = len(userInputWords.intersection(questionWords)) / len(userInputWords.union(questionWords))
             #answerScore = len(userInputWords.intersection(answerWords)) / len(userInputWords.union(answerWords))
-
-            questionScore = len(userInputWords_WoStopwords.intersection(questionWords_WoStopwords)) / len(userInputWords_WoStopwords.union(questionWords_WoStopwords))
-            answerScore = len(userInputWords_WoStopwords.intersection(answerWords_WoStopwords)) / len(userInputWords_WoStopwords.union(answerWords_WoStopwords))
+            try:
+                questionScore = len(userInputWords_WoStopwords.intersection(questionWords_WoStopwords)) / len(userInputWords_WoStopwords.union(questionWords_WoStopwords))
+                answerScore = len(userInputWords_WoStopwords.intersection(answerWords_WoStopwords)) / len(userInputWords_WoStopwords.union(answerWords_WoStopwords))
+            except ZeroDivisionError:
+                questionScore = 0
+                answerScore = 0
 
 
             finalScore = self.getFinalScore(questionScore,answerScore)
             c.addScore(self.agentName,finalScore)
 
             try:
-                if(c.getAnswer()[len(c.getAnswer())-1] != '?'):
+                if(c.getAnswer()[len(c.getAnswer())-1] != '?' and c != bestPairs[0]):
                     if(c.getScoreByEvaluator(self.agentName) > bestPairs[0].getScoreByEvaluator(self.agentName)):
                         bestPairs = [c]
                     elif(c.getScoreByEvaluator(self.agentName) == bestPairs[0].getScoreByEvaluator(self.agentName)):

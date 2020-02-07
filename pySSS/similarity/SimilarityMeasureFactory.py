@@ -1,4 +1,4 @@
-from .SimilarityMeasure import Jaccard, Dice, EditDistance
+from .SimilarityMeasure import Jaccard, Dice, EditDistance, CosineSimilarity
 
 def createSimilarityMeasures(similarityMeasures):
     similarity_measures = []
@@ -10,4 +10,6 @@ def createSimilarityMeasures(similarityMeasures):
             similarity_measures.append(Dice(weight))
         elif similarityMeasures[0][i] == "EditDistance":
             similarity_measures.append(EditDistance(weight))
+        elif similarity_measures[0][i] == "CosineSimilarity":
+            similarity_measures.append(CosineSimilarity(weight))
     return similarity_measures

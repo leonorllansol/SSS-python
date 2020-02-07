@@ -3,7 +3,6 @@ import re
 
 class FaqsAgent:
     def __init__(self,configs):
-        self.useLucene = configs['receiveLuceneCandidates']          #string 'true' ou 'false'; n é convertido para bool
         self.agentName = self.__class__.__name__
         self.normalizeUserInput = True
     

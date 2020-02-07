@@ -2,6 +2,7 @@ import operator
 import configParser
 import sys, logging
 import dialog
+from WeightedMajority import WeightedMajority
 
 """
 The DecisionMaker class is responsible for deciding the best answer to give to the user. 
@@ -134,7 +135,7 @@ class DecisionMaker:
                     for answer in mergedAgentAnswers[agent]:
                         if(type(answer) is dialog.SimpleQA.SimpleQA):
                             answer = answer.getAnswer()
-                        answerFrequency[answer] = answerFrequency.get(answer,0) + 1/len(mergedAgentAnswers[agent])
+                        answerFrequency[answer] = answerFrequency.get(answer,0) + 1
                         print(answer)
 
 
@@ -258,6 +259,15 @@ class DecisionMaker:
 
                 return finalAnswer[0][0]
         
+
+
+        elif(self.decisionMethod == "WeightedVote"):
+
+            mergedAgentAnswers = {**defaultAgentsAnswers, **externalAgentsAnswers}
+            weights = configParser.getWeightResults()
+            wm = WeightedMajority()
+            
+            return wm.mostVotedSelection(weights, mergedAgentAnswers)
 
 
 

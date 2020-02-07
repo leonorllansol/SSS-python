@@ -1,2 +1,4 @@
-MixAgent
-SimplestAgent
+FaqsAgent
+KMeansAgent
+EdgarEngAgent
+DiscordAgent

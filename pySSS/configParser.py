@@ -121,7 +121,13 @@ def getLearningStrategy():
     learningStrategy = mydoc.getElementsByTagName('strategy')[0]
     return learningStrategy.firstChild.data
 
-
+def getWeightResults():
+    weightResults = mydoc.getElementsByTagName('weightResults')[0]
+    return eval(weightResults.firstChild.data)
+    
+def getInitialWeights():
+    initialWeights = mydoc.getElementsByTagName('initialWeights')[0]
+    return eval(initialWeights.firstChild.data)
 
 
 
